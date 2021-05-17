@@ -14,6 +14,7 @@ class Gui {
 	std::shared_ptr<Controller> control;
 	std::vector<std::unique_ptr<nana::button>> mine_buttons;
 	nana::menubar menubar;
+	nana::label status_line;
 	int const width;
 	int const height;
 
@@ -36,11 +37,12 @@ public:
 		, control{ control }
 		, form{}
 		, menubar{ form }
+		, status_line{ form }
 	{
 		// fill form with buttons
 		for (size_t x = 0, y = 0; y < field_height;) {
 			mine_buttons.emplace_back(std::make_unique<nana::button>(form, " "));
-			mine_buttons.back()->events().mouse_up([control, x, y](nana::arg_mouse const& arg){
+			mine_buttons.back()->events().mouse_up([control, x, y](nana::arg_mouse const& arg) {
 				if (arg.button == nana::mouse::left_button) {
 					control->expose(x, y);
 				}
@@ -58,11 +60,14 @@ public:
 		//Layout management
 		nana::place place = nana::place{ form };
 		place.div("vert<menubar weight=28><minefield "
-			"grid=[" + std::to_string(field_width) +","+ std::to_string(field_height) +"]>");
+			"grid=[" + std::to_string(field_width) + "," + std::to_string(field_height) + "]>"
+			"vert<statusline weight=28>"
+		);
 		place["menubar"] << menubar;
 		for (auto const& cell : mine_buttons) {
 			place["minefield"] << *cell;
 		}
+		place["statusline"] << status_line;
 		place.collocate();
 
 		// TODO must be a better way to do this, instead of bind+mem_fn
@@ -99,6 +104,12 @@ public:
 			else {
 				btn.caption(" ");
 			}
+		}
+		if (minefield.is_game_lost()) {
+			status_line.caption("You lost");
+		}
+		else if (minefield.is_game_won()) {
+			status_line.caption("You won");
 		}
 	}
 

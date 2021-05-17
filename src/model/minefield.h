@@ -163,6 +163,13 @@ public:
 		return field[y * width + x];
 	}
 
+	bool is_game_lost() const {
+		return state == GameState::Lost;
+	}
+	bool is_game_won() const {
+		return state == GameState::Won;
+	}
+
 	void expose(int x, int y) {
 		if (get_cell(x, y).is_exposed()) {
 			return;
