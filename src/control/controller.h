@@ -7,8 +7,8 @@ class Controller {
 	std::function<void(Minefield const&)> update_view_callback;
 
 public:
-	Controller(Minefield m)
-		: minefield{m}
+	Controller(Minefield&& m)
+		: minefield{std::move(m)}
 	{}
 
 	void expose(int x, int y) {

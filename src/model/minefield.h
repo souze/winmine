@@ -82,7 +82,7 @@ class Minefield {
 	int const height = 0;
 	std::vector<Cell> field;
 	bool initialized = false; // only initialize the mines after the first click/expose
-	GameState state;
+	GameState state = GameState::Playing;
 	int num_mines = 0;
 
 	void place_mines(int clicked_x, int clicked_y) {
@@ -151,6 +151,12 @@ public:
 		, height{ height }
 		, field{width*height}
 		, num_mines{ num_mines }
+	{}
+
+	Minefield(Minefield&) = delete;
+	
+	Minefield(Minefield&& mf)
+		: Minefield(mf.width, mf.height, mf.num_mines)
 	{}
 
 	Cell& get_cell(int x, int y) {

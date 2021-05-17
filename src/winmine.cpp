@@ -33,9 +33,9 @@ int main()
 	int const field_width = 10;
 	int const num_mines = 11;
 
-	Minefield minefield = Minefield{ field_width, field_height, num_mines };
-	
-	std::shared_ptr<Controller> control = std::make_shared<Controller>( minefield );
+	std::shared_ptr<Controller> control = std::make_shared<Controller>(
+			Minefield{ field_width, field_height, num_mines }
+			);
 
 	Gui gui = Gui{ field_width, field_height, control };
 

@@ -4,6 +4,7 @@
 
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/button.hpp>
+#include <nana/gui/widgets/menubar.hpp>
 
 #include "../control/controller.h"
 
@@ -12,14 +13,29 @@ class Gui {
 
 	std::shared_ptr<Controller> control;
 	std::vector<std::unique_ptr<nana::button>> mine_buttons;
+	nana::menubar menubar;
 	int const width;
 	int const height;
+
+	void fill_menu_bar() {
+		nana::menu& game_item = menubar.push_back("&Game");
+		game_item.append("Reset", [](nana::menu::item_proxy&) {});
+		game_item.append("Settings", [](nana::menu::item_proxy&) {});
+
+		nana::menu& solver_item = menubar.push_back("&Solver");
+		solver_item.append("One move", [](nana::menu::item_proxy&) {});
+		solver_item.append("Mark bombs", [](nana::menu::item_proxy&) {});
+		solver_item.append("Autoplay", [](nana::menu::item_proxy&) {});
+		solver_item.append("Autoplay with delay", [](nana::menu::item_proxy&) {});
+	}
 
 public:
 	Gui(int field_width, int field_height, std::shared_ptr<Controller> control) 
 		: width{ field_width }
 		, height{ field_height }
 		, control{ control }
+		, form{}
+		, menubar{ form }
 	{
 		// fill form with buttons
 		for (size_t x = 0, y = 0; y < field_height;) {
@@ -37,12 +53,16 @@ public:
 			std::cout << x << ", " << y << '\n';
 		}
 
-		//Layout management
-		form.div("<minefield grid=[10,10]>");
+		fill_menu_bar();
 
+		//Layout management
+		nana::place place = nana::place{ form };
+		place.div("vert<menubar weight=28><minefield grid=[10,10]>");
+		place["menubar"] << menubar;
 		for (auto const& cell : mine_buttons) {
-			form["minefield"] << *cell;
+			place["minefield"] << *cell;
 		}
+		place.collocate();
 
 		// TODO must be a better way to do this, instead of bind+mem_fn
 		control->set_update_view_callback([this](Minefield const& mf) {
@@ -52,8 +72,6 @@ public:
 	}
 
 	void start() {
-		form.collocate();
-
 		form.show();
 
 		//Start to event loop process, it blocks until the form is closed.
