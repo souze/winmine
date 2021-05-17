@@ -64,7 +64,6 @@ public:
 		for (auto const& [x, y, cell] : minefield) {
 			nana::button& btn = *mine_buttons[y * width + x];
 			if (cell.is_exposed()) {
-				std::cout << "showing (" << x << ", " << y << ") as exposed\n";
 				if (cell.is_mine()) {
 					btn.caption("x");
 				}
@@ -80,7 +79,6 @@ public:
 			}
 			else {
 				btn.caption(" ");
-				std::cout << "(" << x << ", " << y << ") not exposed\n";
 			}
 		}
 	}

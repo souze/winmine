@@ -71,12 +71,18 @@ void remove_erase(std::vector<int>& vec, int elem) {
 	vec.erase(std::remove(vec.begin(), vec.end(), elem), vec.end());
 }
 
+enum class GameState {
+	Playing
+	, Lost
+	, Won
+};
+
 class Minefield {
 	int const width = 0;
 	int const height = 0;
 	std::vector<Cell> field;
 	bool initialized = false; // only initialize the mines after the first click/expose
-	bool lost = false;
+	GameState state;
 	int num_mines = 0;
 
 	void place_mines(int clicked_x, int clicked_y) {
@@ -164,7 +170,7 @@ public:
 		
 		if (get_cell(x, y).is_mine()) {
 			std::cout << "you lost\n";
-			lost = true;
+			state = GameState::Lost;
 			for (auto& cell : field) {
 				if (cell.is_mine()) {
 					cell.expose();
@@ -179,6 +185,17 @@ public:
 				}
 			}
 		}
+
+		if (count_exposed_cells() == width * height - num_mines) {
+			state = GameState::Won;
+			std::cout << "You have won!\n";
+		}
+	}
+
+	int count_exposed_cells() {
+		return std::count_if(field.begin(), field.end(), [](Cell const& cell) {
+			return cell.is_exposed();
+			});
 	}
 
 	void toggle_marked_bomb(int x, int y) {
