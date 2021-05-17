@@ -29,9 +29,9 @@ struct ClickerCallback {
 
 int main()
 {
-	int const field_height = 9;
-	int const field_width = 10;
-	int const num_mines = 11;
+	int const field_height = 6;
+	int const field_width = 7;
+	int const num_mines = 8;
 
 	std::shared_ptr<Controller> control = std::make_shared<Controller>(
 			Minefield{ field_width, field_height, num_mines }

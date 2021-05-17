@@ -57,7 +57,8 @@ public:
 
 		//Layout management
 		nana::place place = nana::place{ form };
-		place.div("vert<menubar weight=28><minefield grid=[10,10]>");
+		place.div("vert<menubar weight=28><minefield "
+			"grid=[" + std::to_string(field_width) +","+ std::to_string(field_height) +"]>");
 		place["menubar"] << menubar;
 		for (auto const& cell : mine_buttons) {
 			place["minefield"] << *cell;
