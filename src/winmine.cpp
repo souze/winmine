@@ -1,7 +1,5 @@
 ﻿// winmine.cpp : Defines the entry point for the application.
 
-#include "winmine.h"
-
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/button.hpp>

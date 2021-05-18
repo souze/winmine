@@ -2,6 +2,8 @@
 
 #include <numeric>
 #include <array>
+#include <iostream>
+#include <vector>
 
 class Cell {
 	bool exposed = false;
@@ -67,7 +69,7 @@ public:
 	}
 };
 
-void remove_erase(std::vector<int>& vec, int elem) {
+inline void remove_erase(std::vector<int>& vec, int elem) {
 	vec.erase(std::remove(vec.begin(), vec.end(), elem), vec.end());
 }
 

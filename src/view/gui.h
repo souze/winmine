@@ -24,7 +24,9 @@ class Gui {
 		game_item.append("Settings", [](nana::menu::item_proxy&) {});
 
 		nana::menu& solver_item = menubar.push_back("&Solver");
-		solver_item.append("One move", [](nana::menu::item_proxy&) {});
+		solver_item.append("One move", [this](nana::menu::item_proxy&) {
+			control->auto_next_move();
+			});
 		solver_item.append("Mark bombs", [](nana::menu::item_proxy&) {});
 		solver_item.append("Autoplay", [](nana::menu::item_proxy&) {});
 		solver_item.append("Autoplay with delay", [](nana::menu::item_proxy&) {});

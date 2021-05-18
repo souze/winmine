@@ -1,6 +1,9 @@
 #pragma once
 
+#include <functional>
+
 #include "../model/minefield.h"
+#include "../solver/solver.h"
 
 class Controller {
 	Minefield minefield;
@@ -23,7 +26,7 @@ public:
 	}
 
 	void auto_next_move() {
-		// TODO solver::one_move(minefield);
+		Solver::make_one_move(*this);
 	}
 
 	void auto_play() {
