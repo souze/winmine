@@ -7,6 +7,6 @@ class Minefield;
 namespace Solver {
 
 
-	void make_one_move(Controller& control);
+	void make_one_move(Minefield const& minefield, Controller& control);
 
 } // namespace Solver

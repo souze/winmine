@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 
+#include "../lib/util.h"
+
 class Cell {
 	bool exposed = false;
 	bool marked_bomb = false;
@@ -80,8 +82,8 @@ enum class GameState {
 };
 
 class Minefield {
-	int const width = 0;
-	int const height = 0;
+	int width = 0;
+	int height = 0;
 	std::vector<Cell> field;
 	bool initialized = false; // only initialize the mines after the first click/expose
 	GameState state = GameState::Playing;
@@ -106,37 +108,17 @@ class Minefield {
 		return { index % width, index / width };
 	}
 
-	std::vector<int> get_adjacent_indices(int x, int y) {
-		std::vector<int> adjacent_indices;
-		int const index = y * width + x;
-
-		if (y - 1 >= 0) {
-			if (x - 1 >= 0) adjacent_indices.push_back(index - width - 1);
-			adjacent_indices.push_back(index - width);
-			if (x + 1 < width) adjacent_indices.push_back(index - width + 1);
-		}
-		if (x - 1 >= 0) adjacent_indices.push_back(index - 1);
-		if (x + 1 < width) adjacent_indices.push_back(index + 1);
-		if (y + 1 < height) {
-			if (x - 1 >= 0) adjacent_indices.push_back(index + width - 1);
-			adjacent_indices.push_back(index + width);
-			if (x + 1 < width) adjacent_indices.push_back(index + width + 1);
-		}
-		return adjacent_indices;
-	}
-
-	// TODO seems like this is a complicated solution to an easy problem
 	int calc_adjacent_mines(int index) {
 		int const x = index % width;
 		int const y = index / width;
 
-		std::vector<int> adjacent_indices = get_adjacent_indices(x, y);
+		std::vector<std::tuple<int, int>> adjacent_indices = util::get_adjacent_indices(x, y, width, height);
 
-		auto is_valid_and_is_mine = [this](int index) {
-			return index >= 0 && index < this->width * this->height && this->field[index].is_mine();
+		auto is_mine = [this](std::tuple<int,int> pos) {
+			return this->field[std::get<1>(pos)*width + std::get<0>(pos)].is_mine();
 		};
 
-		return std::count_if(adjacent_indices.begin(), adjacent_indices.end(), is_valid_and_is_mine);
+		return std::count_if(adjacent_indices.begin(), adjacent_indices.end(), is_mine);
 	}
 
 	void calculate_num_adjacent_mines() {
@@ -155,11 +137,27 @@ public:
 		, num_mines{ num_mines }
 	{}
 
-	Minefield(Minefield&) = delete;
-	
-	Minefield(Minefield&& mf)
-		: Minefield(mf.width, mf.height, mf.num_mines)
-	{}
+	Minefield& operator=(Minefield& rhs) {
+		using std::swap;
+		swap(*this, rhs);
+		return *this;
+	}
+
+	int get_width() const {
+		return width;
+	}
+
+	int get_height() const {
+		return height;
+	}
+
+	Cell const& get_cell(util::Pos const& pos) const {
+		return field[pos.y * width + pos.x];
+	}
+
+	Cell& get_cell(util::Pos const& pos) {
+		return field[pos.y * width + pos.x];
+	}
 
 	Cell& get_cell(int x, int y) {
 		return field[y * width + x];
@@ -195,8 +193,8 @@ public:
 		else {
 			get_cell(x, y).expose();
 			if (get_cell(x, y).num_adjacent_mines() == 0) {
-				for (int i : get_adjacent_indices(x, y)) {
-					this->expose(i % width, i / width);
+				for (std::tuple<int,int> pos : util::get_adjacent_indices(x, y, width, height)) {
+					this->expose(std::get<0>(pos), std::get<1>(pos));
 				}
 			}
 		}
@@ -223,5 +221,15 @@ public:
 
 	CellIter end() const {
 		return CellIter(field.end(), width);
+	}
+
+	friend void swap(Minefield& lhs, Minefield& rhs) {
+		using std::swap;
+		swap(lhs.width		  , rhs.width		);
+		swap(lhs.height		  , rhs.height		);
+		swap(lhs.field		  , rhs.field		);
+		swap(lhs.initialized  , rhs.initialized	);
+		swap(lhs.state		  , rhs.state		);
+		swap(lhs.num_mines    , rhs.num_mines   );
 	}
 };

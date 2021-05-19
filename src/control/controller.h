@@ -25,8 +25,13 @@ public:
 		update_view_callback(minefield);
 	}
 
+	void new_game(int width, int height, int num_mines) {
+		minefield = Minefield{ width, height, num_mines };
+		update_view_callback(minefield);
+	}
+
 	void auto_next_move() {
-		Solver::make_one_move(*this);
+		Solver::make_one_move(minefield, *this);
 	}
 
 	void auto_play() {

@@ -15,12 +15,15 @@ class Gui {
 	std::vector<std::unique_ptr<nana::button>> mine_buttons;
 	nana::menubar menubar;
 	nana::label status_line;
-	int const width;
-	int const height;
+	int width;
+	int height;
+	int num_mines;
 
 	void fill_menu_bar() {
 		nana::menu& game_item = menubar.push_back("&Game");
-		game_item.append("Reset", [](nana::menu::item_proxy&) {});
+		game_item.append("Reset", [this](nana::menu::item_proxy&) {
+			control->new_game(width, height, num_mines);
+			});
 		game_item.append("Settings", [](nana::menu::item_proxy&) {});
 
 		nana::menu& solver_item = menubar.push_back("&Solver");
@@ -33,9 +36,10 @@ class Gui {
 	}
 
 public:
-	Gui(int field_width, int field_height, std::shared_ptr<Controller> control) 
+	Gui(int field_width, int field_height, int num_mines, std::shared_ptr<Controller> control) 
 		: width{ field_width }
 		, height{ field_height }
+		, num_mines{ num_mines }
 		, control{ control }
 		, form{}
 		, menubar{ form }
@@ -112,6 +116,9 @@ public:
 		}
 		else if (minefield.is_game_won()) {
 			status_line.caption("You won");
+		}
+		else {
+			status_line.caption("");
 		}
 	}
 
