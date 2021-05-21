@@ -100,7 +100,7 @@ class Minefield {
 		for (int i = 0; i < num_mines; ++i) {
 			int mine_index = rand() % available_indices.size();
 			field[available_indices[mine_index]].make_mine();
-			remove_erase(available_indices, mine_index);
+			remove_erase(available_indices, available_indices[mine_index]);
 		}
 	}
 
@@ -137,6 +137,19 @@ public:
 		, num_mines{ num_mines }
 	{}
 
+	Minefield(int width, int height, std::vector<util::Pos> const& mine_locations) 
+		: width{ width }
+		, height{ height }
+		, field{ width * height }
+		, num_mines{ static_cast<int>(mine_locations.size()) }
+	{
+		for (util::Pos const& pos : mine_locations) {
+			field[pos.y * width + pos.x].make_mine();
+		}
+		calculate_num_adjacent_mines();
+		initialized = true;
+	}
+
 	Minefield& operator=(Minefield& rhs) {
 		using std::swap;
 		swap(*this, rhs);
@@ -149,6 +162,10 @@ public:
 
 	int get_height() const {
 		return height;
+	}
+
+	int get_num_mines() const {
+		return num_mines;
 	}
 
 	Cell const& get_cell(util::Pos const& pos) const {
@@ -199,7 +216,7 @@ public:
 			}
 		}
 
-		if (count_exposed_cells() == width * height - num_mines) {
+		if (state == GameState::Playing && count_exposed_cells() == width * height - num_mines) {
 			state = GameState::Won;
 			std::cout << "You have won!\n";
 		}

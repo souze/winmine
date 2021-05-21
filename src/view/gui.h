@@ -9,12 +9,16 @@
 #include "../control/controller.h"
 
 class Gui {
+	static constexpr unsigned int cell_width_pixels = 20;
+	static constexpr unsigned int menubar_height = 26;
+	static constexpr unsigned int status_line_height = 20;
+
 	nana::form form;
+	nana::menubar menubar;
+	std::vector<std::unique_ptr<nana::button>> mine_buttons;
+	nana::label status_line;
 
 	std::shared_ptr<Controller> control;
-	std::vector<std::unique_ptr<nana::button>> mine_buttons;
-	nana::menubar menubar;
-	nana::label status_line;
 	int width;
 	int height;
 	int num_mines;
@@ -32,7 +36,9 @@ class Gui {
 			});
 		solver_item.append("Mark bombs", [](nana::menu::item_proxy&) {});
 		solver_item.append("Autoplay", [](nana::menu::item_proxy&) {});
-		solver_item.append("Autoplay with delay", [](nana::menu::item_proxy&) {});
+		solver_item.append("Autoplay with delay", [this](nana::menu::item_proxy&) {
+			control->auto_play();
+			});
 	}
 
 public:
@@ -41,7 +47,9 @@ public:
 		, height{ field_height }
 		, num_mines{ num_mines }
 		, control{ control }
-		, form{}
+		, form{ nana::rectangle{0, 0, 
+					field_width*cell_width_pixels,
+					field_height*cell_width_pixels + menubar_height + status_line_height } }
 		, menubar{ form }
 		, status_line{ form }
 	{
@@ -58,16 +66,16 @@ public:
 				});
 			y = x < field_width - 1 ? y : y + 1;
 			x = x < field_width - 1 ? x + 1 : 0;
-			std::cout << x << ", " << y << '\n';
 		}
 
 		fill_menu_bar();
 
 		//Layout management
 		nana::place place = nana::place{ form };
-		place.div("vert<menubar weight=28><minefield "
+		place.div("vert<menubar weight="+ std::to_string(menubar_height) +">"
+			"<minefield "
 			"grid=[" + std::to_string(field_width) + "," + std::to_string(field_height) + "]>"
-			"vert<statusline weight=28>"
+			"vert<statusline weight="+ std::to_string(status_line_height) +">"
 		);
 		place["menubar"] << menubar;
 		for (auto const& cell : mine_buttons) {
@@ -76,9 +84,7 @@ public:
 		place["statusline"] << status_line;
 		place.collocate();
 
-		// TODO must be a better way to do this, instead of bind+mem_fn
 		control->set_update_view_callback([this](Minefield const& mf) {
-			std::cout << "Update view CB\n";
 			this->show_minefield(mf);
 			});
 	}
