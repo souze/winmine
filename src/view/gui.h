@@ -36,13 +36,13 @@ class NewGameForm : public nana::form {
 	void new_game() {
 		std::cout << "width: " << text_width.text() << "\n";
 		start_cb(std::stoi(text_width.text()),
-				 std::stoi(text_height.text()),
-			     std::stoi(text_num_mines.text()));
+			std::stoi(text_height.text()),
+			std::stoi(text_num_mines.text()));
 		close();
 	}
 
 public:
-	NewGameForm(StartCallback start_cb) 
+	NewGameForm(StartCallback start_cb)
 		: text_width{ *this, "Width" }
 		, text_height{ *this, "Height" }
 		, text_num_mines{ *this, "# Mines" }
@@ -156,7 +156,7 @@ class Gui {
 	}
 
 public:
-	Gui(int field_width, int field_height, int num_mines, std::shared_ptr<Controller> control) 
+	Gui(int field_width, int field_height, int num_mines, std::shared_ptr<Controller> control)
 		: width{ field_width }
 		, height{ field_height }
 		, num_mines{ num_mines }
@@ -166,7 +166,7 @@ public:
 		, status_line{ form }
 	{
 		fill_menu_bar();
-		
+
 		create_buttons();
 
 		place_components();
@@ -182,7 +182,7 @@ public:
 		//Start to event loop process, it blocks until the form is closed.
 		nana::exec();
 	}
-	
+
 	// Callback used when the minefield has updated, and we need to show the new state
 	void show_minefield(Minefield const& minefield) {
 		if (minefield.get_width() != width ||

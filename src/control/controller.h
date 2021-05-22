@@ -20,7 +20,7 @@ class Controller {
 
 public:
 	Controller(Minefield&& m)
-		: minefield{std::move(m)}
+		: minefield{ std::move(m) }
 	{}
 
 	void expose(util::Pos pos) {

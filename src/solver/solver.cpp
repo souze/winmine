@@ -170,8 +170,8 @@ board_state_result explore_possible_minefield_states(Minefield const& minefield)
 		}
 	}
 
-	double safe_certainty = possible_bomb_squares.empty() ? 
-		.5 : 
+	double safe_certainty = possible_bomb_squares.empty() ?
+		.5 :
 		1 - (*min)->bomb_count / static_cast<double>(total_num_solutions);
 	double unsafe_certainty = possible_bomb_squares.empty() ?
 		.5 : (*max)->bomb_count / static_cast<double>(total_num_solutions);

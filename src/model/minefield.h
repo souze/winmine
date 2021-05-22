@@ -96,7 +96,7 @@ class Minefield {
 		available_indices.resize(field.size());
 		std::iota(available_indices.begin(), available_indices.end(), 0);
 		remove_erase(available_indices, clicked_index);
-		
+
 		for (int i = 0; i < num_mines; ++i) {
 			int mine_index = rand() % available_indices.size();
 			field[available_indices[mine_index]].make_mine();
@@ -114,8 +114,8 @@ class Minefield {
 
 		std::vector<std::tuple<int, int>> adjacent_indices = util::get_adjacent_indices(x, y, width, height);
 
-		auto is_mine = [this](std::tuple<int,int> pos) {
-			return this->field[std::get<1>(pos)*width + std::get<0>(pos)].is_mine();
+		auto is_mine = [this](std::tuple<int, int> pos) {
+			return this->field[std::get<1>(pos) * width + std::get<0>(pos)].is_mine();
 		};
 
 		return std::count_if(adjacent_indices.begin(), adjacent_indices.end(), is_mine);
@@ -133,11 +133,11 @@ public:
 	Minefield(int width, int height, int num_mines)
 		: width{ width }
 		, height{ height }
-		, field{width*height}
+		, field{ width * height }
 		, num_mines{ num_mines }
 	{}
 
-	Minefield(int width, int height, std::vector<util::Pos> const& mine_locations) 
+	Minefield(int width, int height, std::vector<util::Pos> const& mine_locations)
 		: width{ width }
 		, height{ height }
 		, field{ width * height }
@@ -197,7 +197,7 @@ public:
 			calculate_num_adjacent_mines();
 			initialized = true;
 		}
-		
+
 		if (get_cell(x, y).is_mine()) {
 			std::cout << "you lost\n";
 			state = GameState::Lost;
@@ -210,7 +210,7 @@ public:
 		else {
 			get_cell(x, y).expose();
 			if (get_cell(x, y).num_adjacent_mines() == 0) {
-				for (std::tuple<int,int> pos : util::get_adjacent_indices(x, y, width, height)) {
+				for (std::tuple<int, int> pos : util::get_adjacent_indices(x, y, width, height)) {
 					this->expose(std::get<0>(pos), std::get<1>(pos));
 				}
 			}
@@ -242,11 +242,11 @@ public:
 
 	friend void swap(Minefield& lhs, Minefield& rhs) {
 		using std::swap;
-		swap(lhs.width		  , rhs.width		);
-		swap(lhs.height		  , rhs.height		);
-		swap(lhs.field		  , rhs.field		);
-		swap(lhs.initialized  , rhs.initialized	);
-		swap(lhs.state		  , rhs.state		);
-		swap(lhs.num_mines    , rhs.num_mines   );
+		swap(lhs.width, rhs.width);
+		swap(lhs.height, rhs.height);
+		swap(lhs.field, rhs.field);
+		swap(lhs.initialized, rhs.initialized);
+		swap(lhs.state, rhs.state);
+		swap(lhs.num_mines, rhs.num_mines);
 	}
 };

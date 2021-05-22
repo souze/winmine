@@ -74,7 +74,7 @@ void test_moves_solver(std::string const& state_board, std::string const& expect
 }
 
 TEST_CASE("Basic 3x3", "[.]") {
-	
+
 	SECTION("Bomb in middle") {
 		test_moves_solver(R"(
 ooo

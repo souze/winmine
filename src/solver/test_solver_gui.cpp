@@ -15,7 +15,7 @@ int main() {
 	int const field_width = 4;
 	int const field_height = 4;
 	int const num_mines = 5;
-	
+
 	nana::form form;
 	nana::button start_button{ form, "start" };
 	std::vector<std::unique_ptr<nana::label>> labels;
@@ -55,19 +55,19 @@ int main() {
 
 	register_debug_callback(
 		[&](std::string const& msg, SolverField const& solverfield, Minefield const& minefield) {
-		
-		status_line.caption(msg);
-		for (int i = 0; i < field_height*field_width; ++i) {
-			int x = i % field_width;
-			int y = i / field_width;
 
-			Square const& sq = solverfield.squares[i];
-			labels[i]->caption(
-				std::to_string(sq.bomb_count) + "\n" +
-				(sq.is_visited ? "v" : "") +
-				(sq.is_bomb ? ", b" : "")
-			);
-		}
+			status_line.caption(msg);
+			for (int i = 0; i < field_height * field_width; ++i) {
+				int x = i % field_width;
+				int y = i / field_width;
+
+				Square const& sq = solverfield.squares[i];
+				labels[i]->caption(
+					std::to_string(sq.bomb_count) + "\n" +
+					(sq.is_visited ? "v" : "") +
+					(sq.is_bomb ? ", b" : "")
+				);
+			}
 
 		});
 
