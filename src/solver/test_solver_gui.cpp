@@ -44,7 +44,7 @@ int main() {
 		Minefield{ field_width, field_height, std::vector<util::Pos>{ {0,1}, {1,1}, {2,1} } }
 	);
 
-	control->expose(0, 0);
+	control->expose({ 0, 0 });
 	nana::threads::pool thread_pool;
 	start_button.events().click(nana::threads::pool_push(thread_pool, [&control]() {
 		std::cout << "does it even work?\n";

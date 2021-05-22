@@ -122,6 +122,18 @@ int count_possible_bomb_locations(SolverField& solverfield, std::vector<Pos> exp
 namespace Solver {
 
 std::vector<Pos> find_best_moves(Minefield const& minefield) {
+	return explore_possible_minefield_states(minefield).safest_positions;
+}
+
+std::vector<util::Pos> find_bombs(Minefield const& minefield) {
+	board_state_result result = explore_possible_minefield_states(minefield);
+	if (result.unsafe_certainty > .98) { // mark it as bomb if we are 98% certain
+		return result.unsafest_positions;
+	}
+	return {};
+}
+
+board_state_result explore_possible_minefield_states(Minefield const& minefield) {
 	SolverField solverfield{ minefield.get_width(), minefield.get_height() };
 	std::vector<Pos> exposed_squares;
 
@@ -134,7 +146,7 @@ std::vector<Pos> find_best_moves(Minefield const& minefield) {
 		}
 	}
 
-	count_possible_bomb_locations(solverfield, exposed_squares, minefield);
+	int total_num_solutions = count_possible_bomb_locations(solverfield, exposed_squares, minefield);
 
 	std::set<Square*> possible_bomb_squares; // only squares that are adjacent to exposed numbers are relevant
 											 // std::set to avoid duplicated squares.
@@ -148,25 +160,29 @@ std::vector<Pos> find_best_moves(Minefield const& minefield) {
 			return lhs->bomb_count < rhs->bomb_count;
 		});
 
-	std::vector<Square const*> safe_squares, unsafe_squares;
+	std::vector<Pos> safe_squares, unsafe_squares;
 	for (Square const* sq : possible_bomb_squares) {
 		if (sq->bomb_count == (*min)->bomb_count) {
-			safe_squares.push_back(sq);
+			safe_squares.push_back(sq->pos);
 		}
 		if (sq->bomb_count == (*max)->bomb_count) {
-			unsafe_squares.push_back(sq);
+			unsafe_squares.push_back(sq->pos);
 		}
 	}
 
-	std::vector<Pos> safe_positions;
-	std::transform(safe_squares.begin(), safe_squares.end(), std::back_inserter(safe_positions), [](Square const* sq) {
-		return sq->pos;
-		});
-	return safe_positions;
-}
+	double safe_certainty = possible_bomb_squares.empty() ? 
+		.5 : 
+		1 - (*min)->bomb_count / static_cast<double>(total_num_solutions);
+	double unsafe_certainty = possible_bomb_squares.empty() ?
+		.5 : (*max)->bomb_count / static_cast<double>(total_num_solutions);
 
-Pos make_one_move(Minefield const& minefield, Controller& control) {
-	return { -1, -1 }; // TODO is this function really needed?
+
+	return board_state_result{
+		/*.safest_positions = */safe_squares,
+		/*.unsafest_positions = */unsafe_squares,
+		/*.safe_certainty = */safe_certainty,
+		/*.unsafe_certainty = */ unsafe_certainty
+	};
 }
 
 } // namespace Solver

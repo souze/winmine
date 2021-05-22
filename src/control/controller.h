@@ -24,12 +24,8 @@ public:
 	{}
 
 	void expose(util::Pos pos) {
-		expose(pos.x, pos.y);
-	}
-
-	void expose(int x, int y) {
-		std::cout << "Expose on controller\n";
-		minefield.expose(x, y);
+		std::cout << "Exposing " << pos << '\n';
+		minefield.expose(pos.x, pos.y);
 		update_view();
 	}
 
@@ -53,11 +49,34 @@ public:
 		}
 	}
 
-	void auto_play() {
+	void auto_play(std::chrono::milliseconds delay) {
 		while (!minefield.is_game_lost() && !minefield.is_game_won()) {
-			auto_next_move();
-			std::this_thread::sleep_for(std::chrono::milliseconds(80));
+			Solver::board_state_result result = Solver::explore_possible_minefield_states(minefield);
+			if (!result.safest_positions.empty()) {
+				expose(result.safest_positions.back());
+			}
+			else {
+				expose({ rand() % minefield.get_width(), rand() % minefield.get_height() });
+			}
+			if (result.unsafe_certainty > .99) {
+				mark_as_mines(result.unsafest_positions);
+			}
+			std::this_thread::sleep_for(delay);
 		}
+	}
+
+	void mark_as_mines(std::vector<util::Pos> const& positions) {
+		for (util::Pos pos : positions) {
+			Cell const& cell = minefield.get_cell(pos);
+			if (!cell.is_marked_bomb()) {
+				minefield.toggle_marked_bomb(pos.x, pos.y);
+			}
+		}
+	}
+
+	void mark_bombs() {
+		mark_as_mines(Solver::find_bombs(minefield));
+		update_view();
 	}
 
 	void set_update_view_callback(std::function<void(Minefield const&)> cb) {
