@@ -7,6 +7,7 @@
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/menubar.hpp>
 #include <nana/gui/widgets/textbox.hpp>
+#include <nana/threads/pool.hpp>
 
 #include "../control/controller.h"
 
@@ -76,6 +77,7 @@ class Gui {
 	std::unique_ptr<NewGameForm> new_game_form;
 
 	std::shared_ptr<Controller> control;
+	nana::threads::pool thread_pool;
 	int width;
 	int height;
 	int num_mines;
@@ -109,12 +111,16 @@ class Gui {
 			control->mark_bombs();
 			});
 		solver_item.append("Autoplay", [this](nana::menu::item_proxy&) {
-			using namespace std::chrono_literals;
-			control->auto_play(0ms);
+			nana::threads::pool_push(thread_pool, [this]() {
+				using namespace std::chrono_literals;
+				control->auto_play(0ms);
+				})();
 			});
 		solver_item.append("Autoplay with delay", [this](nana::menu::item_proxy&) {
-			using namespace std::chrono_literals;
-			control->auto_play(80ms);
+			nana::threads::pool_push(thread_pool, [this]() {
+				using namespace std::chrono_literals;
+				control->auto_play(80ms);
+				})();
 			});
 	}
 
