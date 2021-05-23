@@ -68,12 +68,12 @@ void test_moves_solver(std::string const& state_board, std::string const& expect
 
 	std::vector<Pos> expected_moves = find_char_positions('m', expected_moves_board);
 
-	std::vector<Pos> actual_moves = Solver::find_best_moves(control->get_minefield());
+	std::vector<Pos> actual_moves = solver::find_best_moves(control->get_minefield());
 
 	REQUIRE(to_set(expected_moves) == to_set(actual_moves));
 }
 
-TEST_CASE("Basic 3x3", "[.]") {
+TEST_CASE("Basic 3x3", "[Basic]") {
 
 	SECTION("Bomb in middle") {
 		test_moves_solver(R"(
@@ -92,8 +92,8 @@ o.o
 ...)",
 
 R"(
-.m.
-mmm
+...
+m.m
 ...)");
 
 		test_moves_solver(R"(

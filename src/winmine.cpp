@@ -11,15 +11,17 @@
 
 int main()
 {
-	int const field_height = 10;
-	int const field_width = 10;
-	int const num_mines = 10;
+    util::GameSettings const settings{
+        10 // height
+        , 10 // width
+        , 10 // num_bombs
+    };
 
 	std::shared_ptr<Controller> control = std::make_shared<Controller>(
-		Minefield{ field_width, field_height, num_mines }
+		Minefield{ settings }
 	);
 
-	Gui gui = Gui{ field_width, field_height, num_mines, control };
+	Gui gui = Gui{ settings, control };
 
 	gui.start();
 }

@@ -6,7 +6,7 @@
 class Controller;
 class Minefield;
 
-namespace Solver {
+namespace solver {
 
 struct board_state_result {
 	std::vector<util::Pos> safest_positions;
